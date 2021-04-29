@@ -48,10 +48,9 @@ ggplot(df.a, aes(x=init_allele_freq, y=delta_allele_freq)) + geom_line(color='do
   
 ```
 
-```{r}
-drift <- function(freq_gen_1, freq_gen_2){
-  abs(freq_gen_1 - freq_gen_2)
-}
+```{r, echo=FALSE}
+colnames(df.a) <- c('Initial allele frequency', 'Pop size', 'Delta allele freq 1 gen')
+knitr::kable(df.a)
 ```
 
 ### Part B
@@ -63,4 +62,9 @@ df.b <- data.frame(init_allele_freq=0.5, pop_size=seq(10, 100, 10))
 df.b$delta_allele_freq <- mapply(expected_change, df.b$init_allele_freq, df.b$pop_size)
 ggplot(df.b, aes(x=pop_size, y=delta_allele_freq)) + geom_line(color='darkred') +
       theme_pubclean() + labs(x='Population size', y='Change allele freq after 1 gen')
+```
+
+```{r, echo=FALSE}
+colnames(df.b) <- c('Initial allele frequency', 'Pop size', 'Delta allele freq 1 gen')
+knitr::kable(df.b)
 ```
