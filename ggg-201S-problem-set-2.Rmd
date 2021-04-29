@@ -70,3 +70,54 @@ ggplot(df.b, aes(x=pop_size, y=delta_allele_freq)) + geom_line(color='darkred') 
 colnames(df.b) <- c('Initial allele frequency', 'Pop size', 'Delta allele freq 1 gen')
 knitr::kable(df.b)
 ```
+
+## Question 2
+
+You sequence a locus in three individuals from a population and obtain the below data:
+```
+I1:
+  GCTACTTTACCATTCTCAGCGAGACGTAAGATCAGGCCAGATCCACCTCG
+  GTTCCTTTAACATTCTCAGCGAGACGTAAGAGCAGGCCAGATCCACCGCC
+I2:
+  GCTCCTTTACCATCCTCAGCGAGACGTAAGATCAGGACAGATCCACCTCG
+  GCTACTTTACCATCCTCAGCGACACGTAAGATCAGGCCAGATCCACCTCG
+I3:
+  GCTACTTTACCATCCTCAGCGAGACGTAAGAGCAGGCCAGATCCACCTCC
+  GCTACTTTACCATCCTCAGCGAGACGTAGGAGCAGGACAGATCCACCTCG
+```
+
+```{r}
+
+seqs 
+
+
+```
+
+### Part A
+
+How many segregating sites (s) are present in these data?
+
+### Part B
+
+What is pi (π) in these data?
+
+### Part C
+
+What are s and π expressed in per site values?
+
+### Part D
+
+What is the minor allele frequency spectrum for these data?
+
+### Part E
+
+You next sequence the locus in a few closely related species and determine the ancestral sequence to bethe following.
+
+```
+Ancestral: GCTCCTTTACCATCCTCAGGGACACGTAAGAGCAGGCCAGACCCACCTCC
+```
+
+What is the derived allele frequency spectrum for these data?
+
+
+
