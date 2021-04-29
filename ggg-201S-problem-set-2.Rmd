@@ -2,7 +2,9 @@
 title: "GGG-201D-problem-set-2"
 author: "Ethan Holleman"
 date: "4/28/2021"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
