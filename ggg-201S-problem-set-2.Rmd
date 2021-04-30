@@ -224,18 +224,59 @@ ggplot(as.data.frame(derived), aes(x=derived))  + geom_bar(fill='tan', color='bl
 ## Question 3
 
 Use a program such as R or Excel to generate a scatter plot that shows the properties of the coalescent process in a Wright-Fisher population. The x-axis should be number of gene copies and range from 2-50. The y-axis should be expected number of generations in N units. Perform calculations in steps of one gene copy and plot the following three expectations: (1) time to the first coalescent event; (2) time to the most recent common ancestor of all gene copies; (3) total tree length.
+```{r}
+gene_copies <- 2:50
+```
 
 ```{r}
-co.df <- data.frame(gene_copies=2:50)
+co.df <- data.frame(gene_copies=gene_copies)
 # E(time to co event ) = 2n / number of gene copies
-first_co_event <- function(row){
-  
-  row.ul <- as.vector(unlist(row))
-  2 / row.ul[1]
-  
+first_co_event <- function(copies){
+  2 / copies
 }
 
-co.df$first_co_event <- apply(co.df, 1, first_co_event)
+co.df$first_co_event <- unlist(lapply(gene_copies, first_co_event))
+```
+
+```{r}
+
+tmrca <- function(gene_copies){
+  
+  vals <- c()
+  for (k in 2:gene_copies){
+    vals <- c(vals, (2 / ((k*(k-1)) / 2)))
+  }
+  sum(vals)
+}
+
+co.df$tmrca <- unlist(lapply(gene_copies, tmrca))
 
 ```
 
+```{r}
+
+ttl <- function(gene_copies){
+   vals <- c()
+  for (k in 2:gene_copies){
+    vals <- c(vals, (2 / ((k*(k-1)) / 2)) * k)
+  }
+  sum(vals)
+}
+
+co.df$ttl <- unlist(lapply(gene_copies, ttl))
+
+```
+
+```{r, warning=FALSE}
+library(reshape2)
+library(ggsci)
+co.df.melt <- melt(co.df, id.vars="gene_copies")
+ggplot(co.df.melt, aes(x=gene_copies, y=value, color=variable)) +
+  geom_line() + theme_pubclean() + 
+  labs(y='Expected number generations (N)', x='Gene copies') +
+  scale_color_discrete(name = "variable", 
+                      labels = c("First coalenscent event", "tMRCA", "TTL"),
+                      ) +
+  scale_color_futurama()
+
+```
