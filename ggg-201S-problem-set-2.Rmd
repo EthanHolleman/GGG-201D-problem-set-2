@@ -86,28 +86,105 @@ I3:
   GCTACTTTACCATCCTCAGCGAGACGTAGGAGCAGGACAGATCCACCTCG
 ```
 
-```{r}
-
-seqs 
-
-
-```
-
 ### Part A
 
 How many segregating sites (s) are present in these data?
 
+```{r}
+
+seq.df <- data.frame(
+  i1.1=unlist(strsplit('GCTACTTTACCATTCTCAGCGAGACGTAAGATCAGGCCAGATCCACCTCG', '')),
+  i1.2=unlist(strsplit('GTTCCTTTAACATTCTCAGCGAGACGTAAGAGCAGGCCAGATCCACCGCC', '')),
+  i2.1=unlist(strsplit('GCTCCTTTACCATCCTCAGCGAGACGTAAGATCAGGACAGATCCACCTCG', '')),
+  i2.2=unlist(strsplit('GCTACTTTACCATCCTCAGCGACACGTAAGATCAGGCCAGATCCACCTCG', '')),
+  i3.1=unlist(strsplit('GCTACTTTACCATCCTCAGCGAGACGTAAGAGCAGGCCAGATCCACCTCC', '')),
+  i3.2=unlist(strsplit('GCTACTTTACCATCCTCAGCGAGACGTAGGAGCAGGACAGATCCACCTCG', ''))
+)
+
+site_is_segregating <- function(row){
+  
+  copy1 <- length(unique(unlist(row[seq(1, length(row), 2)]))) == 1
+  copy2 <- length(unique(unlist(row[seq(2, length(row), 2)]))) == 1
+  if (copy1 & copy2){
+    FALSE
+  }else{
+    TRUE
+  }
+}
+
+seg_sites <- sum(apply(seq.df, 1, site_is_segregating))
+
+message(paste('Number of segregating sites:', seg_sites))
+```
 ### Part B
 
-What is pi (π) in these data?
+What is pi in these data?
+
+```{r}
+
+pi <- function(seq.df){
+  
+  comparisons <- combn(1:ncol(seq.df), 2)
+  distances <- c()
+  for (i in 1:ncol(comparisons)){
+    col_a <- comparisons[1, i]
+    col_b <- comparisons[2, i]
+    num_diffs <- nrow(seq.df) - (sum(seq.df[, col_a] == seq.df[, col_b]))
+    distances <- c(distances, num_diffs)
+  }
+
+ sum(distances) / ncol(comparisons)
+}
+
+pi_genes <- pi(seq.df)
+message(paste('Pi =', pi_genes))
+```
 
 ### Part C
 
-What are s and π expressed in per site values?
+What are s and pi expressed in per site values?
+
+```{r}
+message(paste('Pi per site =', pi_genes / nrow(seq.df)))
+message(paste('Number of segregating sites per site:', seg_sites / nrow(seq.df)))
+```
 
 ### Part D
 
 What is the minor allele frequency spectrum for these data?
+
+```{r}
+# number of sites with given minor allele freq, max could be 3 / 6 otherwise
+# major allele
+# number sites is length of seq
+
+minor_allele_count <- function(row){
+  
+  # get number of unique alleles need to determine what major / minor allele is
+  # if 1 then only 1 allele so minor allele = 09
+  row.ul <- as.vector(unlist(row))
+  unq.alleles <- unique(row.ul)
+  if (length(unq.alleles) == 1){
+    0
+  }else{
+    # should be length 2 if not 1
+    allele.a.count <- sum(row.ul == unq.alleles[1])
+    allele.b.count <- sum(row.ul == unq.alleles[2])
+    # minor allele freq will be the min of these values
+    min(allele.a.count, allele.b.count)
+  }
+}
+
+```
+
+```{r}
+seq.df.minor <- seq.df
+seq.df.minor$minor <- apply(seq.df, 1, minor_allele_count)
+
+ggplot(seq.df.minor, aes(x=minor)) + geom_bar(fill='dodgerblue', color='black') + 
+  theme_pubclean() + labs(x='Minor allele frequency', y='Number of sites')
+
+```
 
 ### Part E
 
@@ -119,5 +196,46 @@ Ancestral: GCTCCTTTACCATCCTCAGGGACACGTAAGAGCAGGCCAGACCCACCTCC
 
 What is the derived allele frequency spectrum for these data?
 
+```{r}
+# add ancestral seq to df
+ancestoral <- 'GCTCCTTTACCATCCTCAGGGACACGTAAGAGCAGGCCAGACCCACCTCC'
+seq.df.anc <- seq.df
+seq.df.anc$ancestor <- unlist(strsplit(ancestoral, ''))
+```
 
+```{r}
+derived_allele_freq <- function(row){
+  
+  # assume ancestral allele is last value
+  row.ul <- as.vector(unlist(row))
+  ansestoral <- row[length(row)]
+  sum(row[1:length(row)-1] != ansestoral)
+  
+}
+```
+
+```{r}
+
+derived <- apply(seq.df.anc, 1, derived_allele_freq)
+ggplot(as.data.frame(derived), aes(x=derived))  + geom_bar(fill='tan', color='black') + 
+  theme_pubclean() + labs(x='Derived allele frequency', y='Number of sites')
+```
+
+## Question 3
+
+Use a program such as R or Excel to generate a scatter plot that shows the properties of the coalescent process in a Wright-Fisher population. The x-axis should be number of gene copies and range from 2-50. The y-axis should be expected number of generations in N units. Perform calculations in steps of one gene copy and plot the following three expectations: (1) time to the first coalescent event; (2) time to the most recent common ancestor of all gene copies; (3) total tree length.
+
+```{r}
+co.df <- data.frame(gene_copies=2:50)
+# E(time to co event ) = 2n / number of gene copies
+first_co_event <- function(row){
+  
+  row.ul <- as.vector(unlist(row))
+  2 / row.ul[1]
+  
+}
+
+co.df$first_co_event <- apply(co.df, 1, first_co_event)
+
+```
 
